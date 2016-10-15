@@ -9,14 +9,14 @@ import config from './config.json';
 import SocketIO from 'socket.io';
 
 let app = express();
-app.server = http.createServer(app);
-let io = new SocketIO(app.server);
+let server = http.createServer(app);
+app.server = server;
+let io = new SocketIO(server);
 
 // 3rd party middleware
 app.use(cors({
 	exposedHeaders: config.corsHeaders
 }));
-
 
 app.use(bodyParser.json({
 	limit : config.bodyLimit
@@ -34,14 +34,19 @@ initializeDb( db => {
 	app.server.listen(process.env.PORT || config.port);
 
 	console.log(`Started on port ${app.server.address().port}`);
+
+  io.on('connection', function(socket){
+    console.log('a user connected');
+    console.log(socket.id);
+  });
 });
 
 app.get('/', function (req, res) {
+  console.log('banana');
   res.send('Hello World!');
 });
 
-io.on('connection', function(socket){
-  console.log('a user connected');
-});
+
+
 
 export default app;
