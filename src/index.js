@@ -22,6 +22,8 @@ app.use(bodyParser.json({
 	limit : config.bodyLimit
 }));
 
+var connectedClients = 0;
+
 // connect to db
 initializeDb( db => {
 
@@ -38,12 +40,24 @@ initializeDb( db => {
   io.on('connection', function(socket){
     console.log('a user connected');
     console.log(socket.id);
+
+    connectedClients++;
+    socket.emit('number_of_clients', {value: `${connectedClients}`});
+    socket.broadcast.emit('number_of_clients', {value: connectedClients});
+    socket.on('disconnect', function() {
+      connectedClients--;
+      socket.broadcast.emit('number_of_clients', {value: connectedClients});
+
+    });
   });
 });
 
 app.get('/', function (req, res) {
   console.log('banana');
   res.send('Hello World!');
+
+
+
 });
 
 
