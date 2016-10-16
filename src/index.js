@@ -46,7 +46,7 @@ initializeDb( db => {
     socket.emit('number_of_clients', {value: connectedClients});
     socket.emit('number_of_clicks', {value: numberOfClicks});
     socket.broadcast.emit('number_of_clients', {value: connectedClients});
-    
+
     socket.on('disconnect', function() {
       connectedClients--;
       socket.broadcast.emit('number_of_clients', {value: connectedClients});
