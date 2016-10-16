@@ -23,6 +23,7 @@ app.use(bodyParser.json({
 }));
 
 var connectedClients = 0;
+var numberOfClicks = 0;
 
 // connect to db
 initializeDb( db => {
@@ -37,17 +38,26 @@ initializeDb( db => {
 
 	console.log(`Started on port ${app.server.address().port}`);
 
-  io.on('connection', function(socket){
+  io.on('connection', function(socket) {
     console.log('a user connected');
     console.log(socket.id);
 
     connectedClients++;
-    socket.emit('number_of_clients', {value: `${connectedClients}`});
+    socket.emit('number_of_clients', {value: connectedClients});
+    socket.emit('number_of_clicks', {value: numberOfClicks});
     socket.broadcast.emit('number_of_clients', {value: connectedClients});
+    
     socket.on('disconnect', function() {
       connectedClients--;
       socket.broadcast.emit('number_of_clients', {value: connectedClients});
 
+    });
+
+    socket.on("click", function() {
+      numberOfClicks++;
+      console.log(`numberOfClicks: ${numberOfClicks}`);
+      socket.emit('number_of_clicks', {value: numberOfClicks});
+      socket.broadcast.emit('number_of_clicks', {value: numberOfClicks});
     });
   });
 });
